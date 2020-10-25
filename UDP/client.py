@@ -5,5 +5,5 @@ server_socket.bind(('',6666))
 print("UDP waiting")
  
 while True:
-        dataFromClient,address = server_socket.recvfrom(256)
-        print(dataFromClient)
+	dataFromClient,address = server_socket.recvfrom(256)
+	print(dataFromClient)

@@ -34,6 +34,8 @@
 # 
 
 import os
+def initializer():
+    updatePos([x+1 for x in range(18)], [500]*18)
 
 def updatePos(ID, pos):
     for  i,p in zip(ID, pos):
@@ -170,13 +172,16 @@ else:
     getch()
     quit()
 
-Fixers(DXL_ID)
+initializer()
 Fixers(FIXED_DXL_ID)
 
-updatePos([7, 9, 11, 13, 15, 17], [500]*6)
+while 1:
+        print("")
 
-Flexers(DXL_ID)
-Flexers(FIXED_DXL_ID)
+# updatePos([7, 9, 11, 13, 15, 17], [500]*6)
+
+# Flexers(DXL_ID)
+# Flexers(FIXED_DXL_ID)
 
 
 # Close port
