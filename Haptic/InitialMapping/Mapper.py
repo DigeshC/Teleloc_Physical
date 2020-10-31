@@ -34,6 +34,34 @@
 # 
 
 import os
+import socket
+
+def mapper(dataZ):
+    z = genMapper([-0.05, 0.100], [300, 700], dataZ[2]))
+
+
+def genMapper(dataFrom, dataTo, dataMap):
+    if dataMap > dataFrom[1]:
+        dataMap = dataFrom[1]
+    elif dataMap < dataFrom[0]:
+        dataMap = dataFrom[0]
+        
+    out = (dataTo[1] - dataTo[0])/(dataFrom[1] - dataFrom[0]) * (dataMap - dataFrom[0]) + (dataTo[0])
+    return int(out)
+
+def initializer():
+    updatePos([x+1 for x in range(18)], [500]*18)
+
+def gatherData():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server_socket.bind(('',6666))
+    print("UDP waiting")
+    
+    while True:
+        dataFromClient,address = server_socket.recvfrom(256)
+        dataFromClient = dataFromClient.split(',')
+        dataZ = [float(x) for x in dataFromClient]
+        mapper(dataZ)
 
 def initializer():
     updatePos([x+1 for x in range(18)], [500]*18)
@@ -172,7 +200,7 @@ else:
     print("Press any key to terminate...")
     getch()
     quit()
-
+'''
 Fixers(DXL_ID)
 Fixers(FIXED_DXL_ID)
 
@@ -183,7 +211,8 @@ while 1:
 
 Flexers(DXL_ID)
 Flexers(FIXED_DXL_ID)
-
+'''
+gatherData()
 
 # Close port
 portHandler.closePort()
