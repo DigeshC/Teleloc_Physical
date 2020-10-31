@@ -35,11 +35,6 @@
 
 import os
 
-def mapper(data):
-    hap1 = data[:3]
-    hap2 = data[3:6]
-    turn = data[6]
-
 def initializer():
     updatePos([x+1 for x in range(18)], [500]*18)
 
@@ -91,8 +86,7 @@ def Fixers(ID):
 
 # Disables torque in servos ID
 def Flexers(ID):
-    for i in ID:[TxRxResult] There is no status packet!
-
+    for i in ID:
         dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, i, ADDR_MX_TORQUE_ENABLE, TORQUE_DISABLE)
         if dxl_comm_result != COMM_SUCCESS:
             print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
@@ -124,7 +118,8 @@ ADDR_MX_GOAL_POSITION      = 30
 ADDR_MX_PRESENT_POSITION   = 36
 
 # Data Byte Length
-LEN_MX_GOAL_POSITION [TxRxResult] There is no status packet!
+LEN_MX_GOAL_POSITION = 2
+LEN_MX_PRESENT_POSITION = 2
 
 PROTOCOL_VERSION            = 1.0               # See which protocol version is used in the Dynamixel
 
