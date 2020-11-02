@@ -53,31 +53,36 @@ def mapperF(data):
             print("Left Active")
             z = genMapper([-0.050, 0.100], [500, 700], data[5])
             x = genMapper([-0.080, 0.080], [400, 600], data[3])
-            updatePos([4, 10, 15], [z, z, 1200 - z])
+            updatePos([4, 10, 15], [z, z, 1000-z])
             updatePos([1,  7, 14], [1000 - x, 1000 - x , x])
             updatePos([2,  8, 13], [1000 - x, 1000 - x , x])
             L = True
         else:
+            L = False
             print("Left up, but can't move")
     else:
         L = False
         
     if (data[2] >= thresholdZ):
-        print(data)
         if(not L):
             print("Right Active")
             z = genMapper([-0.050, 0.100], [500, 700], data[2])
             x = genMapper([-0.080, 0.080], [400, 600], data[0])
 
-            updatePos([3, 9, 16], [1200-z, 1200-z, z])
+            updatePos([3, 9, 16], [1000 - z, 1000-z, z])
             updatePos([1, 7, 14], [x, x , 1000- x])
             updatePos([2, 8, 13], [x, x , 1000- x])
             R = True
         else:
+            R = False
             print("Right up, but can't move")            
     else:
         R = False
       
+    if (not L):
+        updatePos([4, 10, 15], [500]*3)
+    elif (not R):
+        updatePos([3,  9, 16], [500]*3)
 
 
 def genMapper(dataFrom, dataTo, dataMap):
@@ -91,11 +96,16 @@ def genMapper(dataFrom, dataTo, dataMap):
     return int(out)
 
 def initializer():
-    Fixers([x+1 for x in range(18)])
+    
     updatePos([x+1 for x in range(18)], [500]*18)
+    updatePos([11, 17, 5], [600]*3)
+    updatePos([12, 18, 6], [400]*3)
+    Fixers([x+1 for x in range(18)])
 
 
 def selector(data):
+    updatePos([11, 17, 5], [600]*3)
+    updatePos([12, 18, 6], [400]*3)
     if (data[6]):
         mapperT(data[0:3])
     elif (data[7]):
@@ -111,6 +121,7 @@ def gatherData():
     while True:
         dataFromClient,address = server_socket.recvfrom(256)
         dataFromClient = dataFromClient.split(',')
+        #print(dataFromClient)
         try:
             data = [float(x) for x in dataFromClient]
             selector(data)
@@ -118,7 +129,9 @@ def gatherData():
             print ("Value err")
 
 def initializer():
+    Fixers([x+1 for x in range(18)])
     updatePos([x+1 for x in range(18)], [500]*18)
+    
 
 # Updates position in servo
 def updatePos(ID, pos):
@@ -267,6 +280,7 @@ while 1:
 Flexers(DXL_ID)
 Flexers(FIXED_DXL_ID)
 '''
+
 
 initializer()
 gatherData()

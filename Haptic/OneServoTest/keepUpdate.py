@@ -61,17 +61,17 @@ LEN_MX_PRESENT_POSITION    = 2
 PROTOCOL_VERSION            = 1.0               # See which protocol version is used in the Dynamixel
 
 # Default setting
-DXL1_ID                     = 11                 # Dynamixel#1 ID : 1
+DXL1_ID                     = 15                 # Dynamixel#1 ID : 1
 DXL2_ID                     = 7                 # Dynamixel#1 ID : 2
 DXL3_ID                     = 11                 # Dynamixel#1 ID : 7
 BAUDRATE                    = 1000000             # Dynamixel default baudrate : 57600
 DEVICENAME                  = '/dev/ttyUSB0'    # Check which port is being used on your controller
                                                 # ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
 
-TORQUE_ENABLE               = 1                 # Value for enabling the torque
+TORQUE_ENABLE               = 7                 # Value for enabling the torque
 TORQUE_DISABLE              = 0                 # Value for disabling the torque
-DXL_MINIMUM_POSITION_VALUE  = 300           # Dynamixel will rotate between this value
-DXL_MAXIMUM_POSITION_VALUE  = 500            # and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
+DXL_MINIMUM_POSITION_VALUE  = 500           # Dynamixel will rotate between this value
+DXL_MAXIMUM_POSITION_VALUE  = 700            # and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
 DXL_MOVING_STATUS_THRESHOLD = 20                # Dynamixel moving status threshold
 
 index = 0
