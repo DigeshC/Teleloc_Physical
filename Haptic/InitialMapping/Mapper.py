@@ -85,6 +85,7 @@ def updatePos(ID, pos):
     # Clear syncwrite parameter storage
     groupSyncWrite.clearParam()
 
+    """
     while 1:
     # Read Dynamixel#1 present position
         presentPos = []
@@ -100,7 +101,7 @@ def updatePos(ID, pos):
         diff = [abs(x - y) for x,y in zip(presentPos , pos)]
         if not (diff > [DXL_MOVING_STATUS_THRESHOLD]*len(pos)):
             break        
-
+    """
 # Enables torque to active in servos ID
 def Fixers(ID):
     for i in ID:
