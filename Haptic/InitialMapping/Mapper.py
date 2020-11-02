@@ -36,21 +36,42 @@
 import os
 import socket
 
-def mapper(dataZ):
-    z = genMapper([-0.05, 0.100], [300, 700], dataZ[2]))
 
+
+def mapperF(data):
+    thresholdZ = -0.05
+    if (data[2] >= thresholdZ):
+        z = genMapper([-0.050, 0.100], [400, 600], data[2]))
+        x = genMapper([-0.080, 0.080], [400, 600], data[0]))
+        updatePos([1,7,14], [z, z, 1000-z])
+        
+    elif (data[5] >= thresholdZ):
+        z = genMapper([-0.050, 0.100], [400, 600], data[2]))
+        x = genMapper([-0.080, 0.080], [400, 600], data[0]))
+        print("Boo")
 
 def genMapper(dataFrom, dataTo, dataMap):
-    if dataMap > dataFrom[1]:
-        dataMap = dataFrom[1]
-    elif dataMap < dataFrom[0]:
-        dataMap = dataFrom[0]
-        
+    minimum = min(dataFrom)
+    maximum = max(dataFrom)
+    if dataMap >= maximum:
+        dataMap = maximum
+    elif dataMap <= minimum:
+        dataMap = minimum
     out = (dataTo[1] - dataTo[0])/(dataFrom[1] - dataFrom[0]) * (dataMap - dataFrom[0]) + (dataTo[0])
     return int(out)
 
 def initializer():
+    Fixers([x+1 for x in range(18)])
     updatePos([x+1 for x in range(18)], [500]*18)
+
+
+def selector(data):
+    if (data[6]):
+        mapperT(data[0:3])
+    elif (data[7]):
+        mapperT(data[3:6])
+    else:
+        mapperF(data[0:6])
 
 def gatherData():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -58,11 +79,13 @@ def gatherData():
     print("UDP waiting")
     
     while True:
-        dataFromClient,address = server_socket.recvfrom(256)
-        dataFromClient = dataFromClient.split(',')
-        dataZ = [float(x) for x in dataFromClient]
-        mapper(dataZ)
-
+    `   try:
+            dataFromClient,address = server_socket.recvfrom(256)
+            dataFromClient = dataFromClient.split(',')
+            data = [float(x) for x in dataFromClient]
+            selector(data)
+        except e:
+            print (e)
 def initializer():
     updatePos([x+1 for x in range(18)], [500]*18)
 
