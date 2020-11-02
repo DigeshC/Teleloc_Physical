@@ -36,19 +36,49 @@
 import os
 import socket
 
+global L 
+L = False
+global R
+R = False
+
 
 
 def mapperF(data):
+    global L
+    global R
     thresholdZ = -0.05
-    if (data[2] >= thresholdZ):
-        z = genMapper([-0.050, 0.100], [400, 600], data[2]))
-        x = genMapper([-0.080, 0.080], [400, 600], data[0]))
-        updatePos([1,7,14], [z, z, 1000-z])
+    
+    if (data[5] >= thresholdZ):
+        if(not R):
+            print("Left Active")
+            z = genMapper([-0.050, 0.100], [500, 700], data[5])
+            x = genMapper([-0.080, 0.080], [400, 600], data[3])
+            updatePos([4, 10, 15], [z, z, 1200 - z])
+            updatePos([1,  7, 14], [1000 - x, 1000 - x , x])
+            updatePos([2,  8, 13], [1000 - x, 1000 - x , x])
+            L = True
+        else:
+            print("Left up, but can't move")
+    else:
+        L = False
         
-    elif (data[5] >= thresholdZ):
-        z = genMapper([-0.050, 0.100], [400, 600], data[2]))
-        x = genMapper([-0.080, 0.080], [400, 600], data[0]))
-        print("Boo")
+    if (data[2] >= thresholdZ):
+        print(data)
+        if(not L):
+            print("Right Active")
+            z = genMapper([-0.050, 0.100], [500, 700], data[2])
+            x = genMapper([-0.080, 0.080], [400, 600], data[0])
+
+            updatePos([3, 9, 16], [1200-z, 1200-z, z])
+            updatePos([1, 7, 14], [x, x , 1000- x])
+            updatePos([2, 8, 13], [x, x , 1000- x])
+            R = True
+        else:
+            print("Right up, but can't move")            
+    else:
+        R = False
+      
+
 
 def genMapper(dataFrom, dataTo, dataMap):
     minimum = min(dataFrom)
@@ -79,13 +109,14 @@ def gatherData():
     print("UDP waiting")
     
     while True:
-    `   try:
-            dataFromClient,address = server_socket.recvfrom(256)
-            dataFromClient = dataFromClient.split(',')
+        dataFromClient,address = server_socket.recvfrom(256)
+        dataFromClient = dataFromClient.split(',')
+        try:
             data = [float(x) for x in dataFromClient]
             selector(data)
-        except e:
-            print (e)
+        except ValueError:
+            print ("Value err")
+
 def initializer():
     updatePos([x+1 for x in range(18)], [500]*18)
 
@@ -236,6 +267,8 @@ while 1:
 Flexers(DXL_ID)
 Flexers(FIXED_DXL_ID)
 '''
+
+initializer()
 gatherData()
 
 # Close port
