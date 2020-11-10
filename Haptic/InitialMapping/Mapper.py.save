@@ -53,7 +53,7 @@ def mapperF(data):
             print("Left Active")
             z = genMapper([-0.050, 0.100], [320, 75], data[5])
             x = genMapper([-0.080, 0.080], [400, 600], data[3])
-            updatePos([4, 10, 15], [inverse(z), inverse(z), z])
+            updatePos([4, 10, 15], [z, z, inverse(z)])
             updatePos([1,  7, 14], [1000 - x, 1000 - x , x])
             updatePos([2,  8, 13], [1000 - x, 1000 - x , x])
             L = True
@@ -69,7 +69,7 @@ def mapperF(data):
             z = genMapper([-0.050, 0.100], [320, 75], data[2])
             x = genMapper([-0.080, 0.080], [400, 600], data[0])
 
-            updatePos([3, 9, 16], [z, z, inverse(z)])
+            updatePos([3, 9, 16], [inverse(z), inverse(z), z])
             updatePos([1, 7, 14], [x, x , 1000- x])
             updatePos([2, 8, 13], [x, x , 1000- x])
             R = True
@@ -80,7 +80,7 @@ def mapperF(data):
         R = False
       
     if (not L):
-        updatePos([4, 10, 15], [inverse(320), inverse(320), 320])
+        updatePos([4, 10, 15], [inverse(320), inverse(320), inverse(320)])
     elif (not R):
         updatePos([3,  9, 16], [320, 320, inverse(320)])
 
@@ -108,8 +108,8 @@ def initializer():
 
 
 def selector(data):
-    updatePos([11, 17, 5], [850]*3)
-    updatePos([12, 18, 6], [inverse(850)]*3)
+    updatePos([11, 17, 5], [600]*3)
+    updatePos([12, 18, 6], [400]*3)
     if (data[6]):
         mapperT(data[0:3])
     elif (data[7]):
@@ -131,6 +131,10 @@ def gatherData():
             selector(data)
         except ValueError:
             print ("Value err")
+
+def initializer():
+    Fixers([x+1 for x in range(18)])
+    updatePos([x+1 for x in range(18)], [500]*18)
     
 
 # Updates position in servo

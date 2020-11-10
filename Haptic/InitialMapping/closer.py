@@ -34,143 +34,8 @@
 # 
 
 import os
-import socket
 
-global L 
-L = False
-global R
-R = False
-
-
-
-def mapperF(data):
-    global L
-    global R
-    thresholdZ = -0.05
-    
-    if (data[5] >= thresholdZ):
-        if(not R):
-            print("Left Active")
-            z = genMapper([-0.050, 0.100], [320, 75], data[5])
-            x = genMapper([-0.080, 0.080], [400, 600], data[3])
-            updatePos([4, 10, 15], [inverse(z), inverse(z), z])
-            updatePos([1,  7, 14], [1000 - x, 1000 - x , x])
-            updatePos([2,  8, 13], [1000 - x, 1000 - x , x])
-            L = True
-        else:
-            L = False
-            print("Left up, but can't move")
-    else:
-        L = False
-        
-    if (data[2] >= thresholdZ):
-        if(not L):
-            print("Right Active")
-            z = genMapper([-0.050, 0.100], [320, 75], data[2])
-            x = genMapper([-0.080, 0.080], [400, 600], data[0])
-
-            updatePos([3, 9, 16], [z, z, inverse(z)])
-            updatePos([1, 7, 14], [x, x , 1000- x])
-            updatePos([2, 8, 13], [x, x , 1000- x])
-            R = True
-        else:
-            R = False
-            print("Right up, but can't move")
-    else:
-        R = False
-      
-    if (not L):
-        updatePos([4, 10, 15], [inverse(320), inverse(320), 320])
-    elif (not R):
-        updatePos([3,  9, 16], [320, 320, inverse(320)])
-
-
-def genMapper(dataFrom, dataTo, dataMap):
-    minimum = min(dataFrom)
-    maximum = max(dataFrom)
-    if dataMap >= maximum:
-        dataMap = maximum
-    elif dataMap <= minimum:
-        dataMap = minimum
-    out = (dataTo[1] - dataTo[0])/(dataFrom[1] - dataFrom[0]) * (dataMap - dataFrom[0]) + (dataTo[0])
-    return int(out)
-
-def inverse(x):
-    return 1023-x
-
-def initializer():
-    updatePos([1, 2, 7, 8, 13, 14], [512]*6)
-    updatePos([3, 15, 9],[320]*3)
-    updatePos([4, 16, 10], [inverse(320)]*3)
-    updatePos([11, 17, 5], [850]*3)
-    updatePos([12, 18, 6], [inverse(850)]*3)
-    Fixers([x+1 for x in range(18)])
-
-
-def selector(data):
-    updatePos([11, 17, 5], [850]*3)
-    updatePos([12, 18, 6], [inverse(850)]*3)
-    if (data[6]):
-        mapperT(data[0:3])
-    elif (data[7]):
-        mapperT(data[3:6])
-    else:
-        mapperF(data[0:6])
-
-def gatherData():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_socket.bind(('',6666))
-    print("UDP waiting")
-    
-    while True:
-        dataFromClient,address = server_socket.recvfrom(256)
-        dataFromClient = dataFromClient.split(',')
-        #print(dataFromClient)
-        try:
-            data = [float(x) for x in dataFromClient]
-            selector(data)
-        except ValueError:
-            print ("Value err")
-    
-
-# Updates position in servo
-def updatePos(ID, pos):
-    for  i,p in zip(ID, pos):
-        # Allocate goal position value into byte array
-        param_goal_position = [DXL_LOBYTE(DXL_LOWORD(p)), DXL_HIBYTE(DXL_LOWORD(p))] #Keep a list of 2 (VIMP) 
-        # Add Dynamixel#1 goal position value to the Syncwrite parameter storage
-        dxl_addparam_result = groupSyncWrite.addParam(i, param_goal_position)
-        if dxl_addparam_result != True:
-            print("[ID:%03d] groupSyncWrite addparam failed" % i)
-            quit()
-
-    # Syncwrite goal position
-    dxl_comm_result = groupSyncWrite.txPacket()
-    if dxl_comm_result != COMM_SUCCESS:
-        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-
-    # Clear syncwrite parameter storage
-    groupSyncWrite.clearParam()
-
-    """
-    while 1:
-    # Read Dynamixel#1 present position
-        presentPos = []
-        for i in ID:
-            present_position, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, i, ADDR_MX_PRESENT_POSITION)
-            presentPos.append(present_position)
-
-            if dxl_comm_result != COMM_SUCCESS:
-                print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-            elif dxl_error != 0:
-                print("%s" % packetHandler.getRxPacketError(dxl_error))
-
-        diff = [abs(x - y) for x,y in zip(presentPos , pos)]
-        if not (diff > [DXL_MOVING_STATUS_THRESHOLD]*len(pos)):
-            break        
-    """
-# Enables torque to active in servos ID
-def Fixers(ID):
+def initializer(ID):
     for i in ID:
         dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, i, ADDR_MX_TORQUE_ENABLE, TORQUE_ENABLE)
         if dxl_comm_result != COMM_SUCCESS:
@@ -180,8 +45,7 @@ def Fixers(ID):
         else:
             print("Dynamixel#%d has been successfully connected" % i)
 
-# Disables torque in servos ID
-def Flexers(ID):
+def Terminator(ID):
     for i in ID:
         dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, i, ADDR_MX_TORQUE_ENABLE, TORQUE_DISABLE)
         if dxl_comm_result != COMM_SUCCESS:
@@ -214,13 +78,13 @@ ADDR_MX_GOAL_POSITION      = 30
 ADDR_MX_PRESENT_POSITION   = 36
 
 # Data Byte Length
-LEN_MX_GOAL_POSITION = 2
-LEN_MX_PRESENT_POSITION = 2
+LEN_MX_GOAL_POSITION       = 2
+LEN_MX_PRESENT_POSITION    = 2
 
+# Protocol version
 PROTOCOL_VERSION            = 1.0               # See which protocol version is used in the Dynamixel
 
-# Default settingTerminator(DXL_ID)
-# Terminator(FIXED_DXL_ID)
+# Default setting
 FIXED_DXL_ID                = [5, 6, 11, 12, 17,18]
 DXL_ID                      = [1, 2, 3, 4, 7, 8, 9, 10, 13, 14, 15, 16]
 
@@ -245,6 +109,10 @@ dxl_goal_position = [DXL_MINIMUM_POSITION_VALUE, DXL_MAXIMUM_POSITION_VALUE]    
 # Set the port path
 # Get methods and members of PortHandlerLinux or PortHandlerWindows
 portHandler = PortHandler(DEVICENAME)
+
+# Initialize PacketHandler instance
+# Set the protocol version
+# Get methods and members of Protocol1PacketHandler or Protocol2PacketHandler
 packetHandler = PacketHandler(PROTOCOL_VERSION)
 
 # Initialize GroupSyncWrite instance
@@ -268,22 +136,12 @@ else:
     print("Press any key to terminate...")
     getch()
     quit()
-'''
-Fixers(DXL_ID)
-Fixers(FIXED_DXL_ID)
 
-updatePos([7, 9, 11, 8, 10, 12], [500]*6)
+initializer(DXL_ID)
+initializer(FIXED_DXL_ID)
+Terminator(DXL_ID)
+Terminator(FIXED_DXL_ID)
 
-while 1:
-    print("Yes")
-
-Flexers(DXL_ID)
-Flexers(FIXED_DXL_ID)
-'''
-
-
-initializer()
-gatherData()
 
 # Close port
 portHandler.closePort()

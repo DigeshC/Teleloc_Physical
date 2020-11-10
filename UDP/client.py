@@ -1,7 +1,7 @@
 import socket
  
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket.bind(('',6666))
+server_socket.bind(('',6667))
 print("UDP waiting")
  
 while True:
