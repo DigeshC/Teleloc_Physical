@@ -90,15 +90,16 @@ def mapperF(data):
         updatePos([3,  9, 16], [320, 320, inverse(320)])
 
 
-def mapperT(data):
+def mapperT1(data):
     global T1Flag
+    global T1Change
     thresholdY = 0.02
 
     if(data[1] >= thresholdY and T1Flag):
         T1Change = True
         y = genMapper([0.020, 0.080], [320, 75], data[1])
         x = genMapper([-0.080, 0.080], [624, 400], data[0])
-        updatePos([4,10,15], [inverse(y), inverse(y), y])
+        updatePos([4, 10, 15], [inverse(y), inverse(y), y])
         updatePos([1, 7, 14], [inverse(x), inverse(x), inverse(x)])
         updatePos([2, 8, 13], [x, x, x])
     elif(data[1] >= thresholdY and not(T1Flag)):
@@ -112,6 +113,30 @@ def mapperT(data):
         if(T1Change):
             T1Flag = not(T1Flag)
             T1Change = False
+
+def mapperT2(data):
+    global T2Flag
+    global T2Change
+    thresholdY = -0.02
+    print("Turn2", T2Flag)
+    if(data[1] <= thresholdY and T2Flag):
+        T2Change = True
+        y = genMapper([-0.020, -0.080], [320, 75], data[1])
+        x = genMapper([-0.080, 0.080], [624, 400], data[0])
+        updatePos([4, 10, 15], [inverse(y), inverse(y), y])
+        updatePos([1, 7, 14], [x, x, x])
+        updatePos([2, 8, 13], [inverse(x), inverse(x), inverse(x)])
+    elif(data[1] <= thresholdY and not(T2Flag)):
+        T2Change = True
+        y = genMapper([-0.020, -0.080], [320, 75], data[1])
+        x = genMapper([-0.080, 0.080], [624, 400], data[0])
+        updatePos([3, 9, 16], [y, y, inverse(y)])
+        updatePos([1, 7, 14], [inverse(x), inverse(x), inverse(x)])
+        updatePos([2, 8, 13], [x, x, x])
+    else:
+        if(T2Change):
+            T2Flag = not(T2Flag)
+            T2Change = False
 
 def genMapper(dataFrom, dataTo, dataMap):
     minimum = min(dataFrom)
@@ -139,9 +164,9 @@ def selector(data):
     updatePos([11, 17, 5], [850]*3)
     updatePos([12, 18, 6], [inverse(850)]*3)
     if (data[6]):
-        mapperT(data[0:3])
+        mapperT1(data[0:3])
     elif (data[7]):
-        mapperT(data[3:6])
+        mapperT2(data[3:6])
     else:
         mapperF(data[0:6])
 
