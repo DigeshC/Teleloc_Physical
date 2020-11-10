@@ -40,7 +40,14 @@ global L
 L = False
 global R
 R = False
-
+global T1Flag
+global T1Change
+T1Change = False
+T1Flag = True
+global T2Flag
+global T2Change
+T2Change = False
+T2Flag = True
 
 
 def mapperF(data):
@@ -52,10 +59,10 @@ def mapperF(data):
         if(not R):
             print("Left Active")
             z = genMapper([-0.050, 0.100], [320, 75], data[5])
-            x = genMapper([-0.080, 0.080], [400, 600], data[3])
+            x = genMapper([-0.080, 0.080], [624, 400], data[3])
             updatePos([4, 10, 15], [inverse(z), inverse(z), z])
-            updatePos([1,  7, 14], [1000 - x, 1000 - x , x])
-            updatePos([2,  8, 13], [1000 - x, 1000 - x , x])
+            updatePos([1,  7, 14], [inverse(x), inverse(x), x])
+            updatePos([2,  8, 13], [inverse(x), inverse(x), x])
             L = True
         else:
             L = False
@@ -67,23 +74,44 @@ def mapperF(data):
         if(not L):
             print("Right Active")
             z = genMapper([-0.050, 0.100], [320, 75], data[2])
-            x = genMapper([-0.080, 0.080], [400, 600], data[0])
-
+            x = genMapper([-0.080, 0.080], [624, 400], data[0])
             updatePos([3, 9, 16], [z, z, inverse(z)])
-            updatePos([1, 7, 14], [x, x , 1000- x])
-            updatePos([2, 8, 13], [x, x , 1000- x])
+            updatePos([1, 7, 14], [x, x, inverse(x)])
+            updatePos([2, 8, 13], [x, x, inverse(x)])
             R = True
         else:
             R = False
             print("Right up, but can't move")
     else:
         R = False
-      
     if (not L):
         updatePos([4, 10, 15], [inverse(320), inverse(320), 320])
     elif (not R):
         updatePos([3,  9, 16], [320, 320, inverse(320)])
 
+
+def mapperT(data):
+    global T1Flag
+    thresholdY = 0.02
+
+    if(data[1] >= thresholdY and T1Flag):
+        T1Change = True
+        y = genMapper([0.020, 0.080], [320, 75], data[1])
+        x = genMapper([-0.080, 0.080], [624, 400], data[0])
+        updatePos([4,10,15], [inverse(y), inverse(y), y])
+        updatePos([1, 7, 14], [inverse(x), inverse(x), inverse(x)])
+        updatePos([2, 8, 13], [x, x, x])
+    elif(data[1] >= thresholdY and not(T1Flag)):
+        T1Change = True
+        y = genMapper([0.020, 0.080], [320, 75], data[1])
+        x = genMapper([-0.080, 0.080], [624, 400], data[0])
+        updatePos([3, 9, 16], [y, y, inverse(y)])
+        updatePos([1, 7, 14], [x, x, x])
+        updatePos([2, 8, 13], [inverse(x), inverse(x), inverse(x)])
+    else:
+        if(T1Change):
+            T1Flag = not(T1Flag)
+            T1Change = False
 
 def genMapper(dataFrom, dataTo, dataMap):
     minimum = min(dataFrom)
